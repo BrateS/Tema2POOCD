@@ -15,11 +15,9 @@ public final class Main {
 
     public static void main(final String[] args) {
 
-        //Reader reader = new Reader("/home/brate/Desktop/Tema2POOCD/Tema2POOCD/input/test30.in");
         Reader reader = new Reader(args[0]);
         ImageCommand[]imageCommands = reader.getImageCommands();
         System.out.println(Arrays.toString(imageCommands));
-        System.out.println(imageCommands.length);
 
         DrawVisitor visitor = new DrawVisitor(imageCommands[0]);
 

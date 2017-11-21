@@ -4,8 +4,7 @@ import commands.ImageCommand;
 import interfaces.Shape;
 import interfaces.Visitable;
 import interfaces.Visitor;
-
-import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 public final class Polygon extends Shape implements Visitable {
 
@@ -17,54 +16,85 @@ public final class Polygon extends Shape implements Visitable {
     public void accept(final Visitor visitor) {
         visitor.visit(this);
     }
+    final class Point {
+        private float x, y;
 
-    public int getArea() {
+        public float getX() {
+            return x;
+        }
+
+        public void setX(final float x) {
+            this.x = x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public void setY(final float y) {
+            this.y = y;
+        }
+
+        Point(final float x, final float y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public String toString() {
+            return "Point{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    '}';
+        }
+    }
+
+    public  ArrayList<Point> getPoints() {
         ImageCommand imageCommand = this.getImageCommand();
-        int area = 0;
-        int xPrev = imageCommand.getNumaricArgs()[1];
-        int yPrev = imageCommand.getNumaricArgs()[2];
-        for (int i = 3; i < imageCommand.getNumaricArgs()[0] * 2 - 2; i += 2) {
-            int xCur = imageCommand.getNumaricArgs()[i];
-            int yCur = imageCommand.getNumaricArgs()[i + 1];
-            int auxSum = xCur * yPrev - xPrev * yCur;
+        ArrayList<Point> list = new ArrayList<>();
+        for (int i = 1; i < (imageCommand.getNumericArgs()[0]) * 2; i += 2) {
+            int xCur = imageCommand.getNumericArgs()[i];
+            int yCur = imageCommand.getNumericArgs()[i + 1];
+            Point point = new Point(xCur, yCur);
+            list.add(new Point(xCur, yCur));
+        }
+        return list;
+    }
+
+    private float getArea() {
+        float area = 0;
+        ArrayList<Point> points = getPoints();
+
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+            Point nextPoint = points.get((i + 1) % points.size());
+
+            float auxSum = point.getX() * nextPoint.getY()
+                    - nextPoint.getX() * point.getY();
             area += auxSum;
-            xPrev = xCur;
-            yPrev = yCur;
         }
         return area / 2;
     }
-
     public int[] getCenterOfGravity() {
-        ImageCommand imageCommand = this.getImageCommand();
-        int area = getArea();
-        int xResult = 0;
-        int yResult = 0;
-        int xPrev = imageCommand.getNumaricArgs()[1];
-        int yPrev = imageCommand.getNumaricArgs()[2];
-
-        for (int i = 3; i < imageCommand.getNumaricArgs()[0] * 2 - 2; i += 2) {
-            int xCur = imageCommand.getNumaricArgs()[i];
-            int yCur = imageCommand.getNumaricArgs()[(i + 1)
-                    % (imageCommand.getNumaricArgs()[0] * 2)];
-
-            System.out.println(xCur + " " + yCur);
-            int xFirstElement = xCur + xPrev;
-            int yFirstElement = yCur + yPrev;
-            int secondElement = xCur * yPrev - xPrev * yCur;
-            int xAuxSum = xFirstElement * secondElement;
-            int yAuxSum = yFirstElement * secondElement;
-            xResult -= xAuxSum;
-            yResult -= yAuxSum;
-
-            xPrev = xCur;
-            yPrev = yCur;
-        }
-
-        final int formulaConstant = 6;
         int[]result = new int[2];
+        float area = getArea();
+        ArrayList<Point> points = getPoints();
+        float x = 0, y = 0;
 
-        result[0] = (xResult / formulaConstant) / area;
-        result[1] = (yResult / formulaConstant) / area;
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+            Point nextPoint = points.get((i + 1) % points.size());
+
+            float xFirstTerm = point.getX() + nextPoint.getX();
+            float yFirstTerm = point.getY() + nextPoint.getY();
+            float secondTerm = point.getX() * nextPoint.getY()
+                    - nextPoint.getX() * point.getY();
+            x += xFirstTerm * secondTerm;
+            y += yFirstTerm * secondTerm;
+        }
+        final int formulaConstant = 6;
+        result[0] = Math.round((x / formulaConstant) / area);
+        result[1] = Math.round((y / formulaConstant) / area);
         return result;
     }
 }

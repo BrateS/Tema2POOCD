@@ -33,7 +33,7 @@ public final class ImageCommand {
         this.command = command;
     }
 
-    public int[] getNumaricArgs() {
+    public int[] getNumericArgs() {
         return numaricArgs;
     }
     public Color[] getColorArgs() {

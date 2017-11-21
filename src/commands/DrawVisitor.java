@@ -14,8 +14,8 @@ public final class DrawVisitor implements Visitor {
     public DrawVisitor(final ImageCommand imageCommand) {
         Canvas image = Canvas
                 .getInstance(
-                        imageCommand.getNumaricArgs()[1],
-                        imageCommand.getNumaricArgs()[0]
+                        imageCommand.getNumericArgs()[1],
+                        imageCommand.getNumericArgs()[0]
                 );
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
@@ -35,18 +35,97 @@ public final class DrawVisitor implements Visitor {
         Canvas image = Canvas.getInstance();
         drawContour(image,
                 imageCommand.getColorArgs()[0],
-                imageCommand.getNumaricArgs()[0],
-                imageCommand.getNumaricArgs()[1],
-                imageCommand.getNumaricArgs()[2]);
-        apply(image,
+                imageCommand.getNumericArgs()[0],
+                imageCommand.getNumericArgs()[1],
+                imageCommand.getNumericArgs()[2]);
+        fill(image,
                 imageCommand.getColorArgs()[0].getRGB(),
                 imageCommand.getColorArgs()[1].getRGB(),
-                imageCommand.getNumaricArgs()[0],
-                imageCommand.getNumaricArgs()[1]);
+                imageCommand.getNumericArgs()[0],
+                imageCommand.getNumericArgs()[1]);
     }
 
     @Override
     public void visit(final Diamond diamond) {
+        //constructing imageCommand for polygon from diamond
+        final int nrPointDiamond = 4;
+        ImageCommand imageCommand = diamond.getImageCommand();
+        Color contourColor = diamond.getImageCommand().getColorArgs()[0];
+        int semiDiagOriz = Math.floorDiv(diamond.getImageCommand().getNumericArgs()[2], 2);
+        int semiDiagVert = Math.floorDiv(diamond.getImageCommand().getNumericArgs()[3], 2);
+        int xCenter = diamond.getImageCommand().getNumericArgs()[0];
+        int yCenter = diamond.getImageCommand().getNumericArgs()[1];
+
+        int xStart = xCenter;
+        int yStart = yCenter - semiDiagVert;
+        int xFinal = xCenter + semiDiagOriz;
+        int yFinal = yCenter;
+        Line line = new Line(getLineCommand(
+                xStart,
+                yStart,
+                xFinal,
+                yFinal ,
+                contourColor));
+        line.accept(this);
+
+        xStart = xCenter + semiDiagOriz;
+        yStart = yCenter;
+        xFinal = xCenter;
+        yFinal = yCenter + semiDiagVert;
+
+        line = new Line(getLineCommand(
+                xStart,
+                yStart,
+                xFinal,
+                yFinal ,
+                contourColor));
+        line.accept(this);
+
+        xStart = xCenter;
+        yStart = yCenter + semiDiagVert;
+        xFinal = xCenter - semiDiagOriz;
+        yFinal = yCenter;
+
+        line = new Line(getLineCommand(
+                xStart,
+                yStart,
+                xFinal,
+                yFinal ,
+                contourColor));
+        line.accept(this);
+
+        xStart = xCenter;
+        yStart = yCenter - semiDiagVert;
+        xFinal = xCenter - semiDiagOriz;
+        yFinal = yCenter;
+
+        line = new Line(getLineCommand(
+                xStart,
+                yStart,
+                xFinal,
+                yFinal ,
+                contourColor));
+        line.accept(this);
+
+        imageCommand.addNumericArgs(xCenter);
+        imageCommand.addNumericArgs(yCenter - semiDiagVert);
+
+        imageCommand.addNumericArgs(xCenter + semiDiagOriz);
+        imageCommand.addNumericArgs(yCenter);
+
+        imageCommand.addNumericArgs(xCenter);
+        imageCommand.addNumericArgs(yCenter + semiDiagVert);
+
+        imageCommand.addNumericArgs(xCenter - semiDiagOriz);
+        imageCommand.addNumericArgs(yCenter);
+
+        Canvas image = Canvas.getInstance();
+
+        fill(image,
+                imageCommand.getColorArgs()[0].getRGB(),
+                imageCommand.getColorArgs()[1].getRGB(),
+                imageCommand.getNumericArgs()[0],
+                imageCommand.getNumericArgs()[1]);
 
     }
 
@@ -56,10 +135,10 @@ public final class DrawVisitor implements Visitor {
 
         final int yFinalPosition = 3;
         ImageCommand imageCommand = line.getImageCommand();
-        int xStart = imageCommand.getNumaricArgs()[0];
-        int yStart = imageCommand.getNumaricArgs()[1];
-        int xFinal = imageCommand.getNumaricArgs()[2];
-        int yFinal = imageCommand.getNumaricArgs()[yFinalPosition];
+        int xStart = imageCommand.getNumericArgs()[0];
+        int yStart = imageCommand.getNumericArgs()[1];
+        int xFinal = imageCommand.getNumericArgs()[2];
+        int yFinal = imageCommand.getNumericArgs()[yFinalPosition];
         int x = xStart;
         int y = yStart;
         int deltaX = Math.abs(xFinal - xStart);
@@ -80,7 +159,7 @@ public final class DrawVisitor implements Visitor {
         int error = 2 * deltaY - deltaX;
 
         for (int i = 0; i <= deltaX; i++) {
-            if (!(x > image.getWidth() - 1 || y > image.getHeight() - 1) || x < 0 || y < 0) {
+            if (!(x > image.getWidth() - 1 || y > image.getHeight() - 1 || x < 0 || y < 0)) {
                 image.setRGB(x, y, imageCommand.getColorArgs()[0].getRGB());
             }
             while (error > 0) {
@@ -110,10 +189,10 @@ public final class DrawVisitor implements Visitor {
         ImageCommand imageCommand = rectangle.getImageCommand();
         Color contourColor = imageCommand.getColorArgs()[0];
         Color interiorColor = imageCommand.getColorArgs()[1];
-        int xStart = imageCommand.getNumaricArgs()[0];
-        int yStart = imageCommand.getNumaricArgs()[1];
-        int width = imageCommand.getNumaricArgs()[widthArrayLocation];
-        int height = imageCommand.getNumaricArgs()[2];
+        int xStart = imageCommand.getNumericArgs()[0];
+        int yStart = imageCommand.getNumericArgs()[1];
+        int width = imageCommand.getNumericArgs()[widthArrayLocation];
+        int height = imageCommand.getNumericArgs()[2];
 
 
         Line line = new Line(getLineCommand(
@@ -160,7 +239,7 @@ public final class DrawVisitor implements Visitor {
     @Override
     public void visit(final Square square) {
         ImageCommand imageCommand = square.getImageCommand();
-        imageCommand.addNumericArgs(imageCommand.getNumaricArgs()[2]);
+        imageCommand.addNumericArgs(imageCommand.getNumericArgs()[2]);
         Rectangle rectangle = new Rectangle(imageCommand);
         rectangle.accept(this);
     }
@@ -170,11 +249,13 @@ public final class DrawVisitor implements Visitor {
         Color contourColor = polygon.getImageCommand().getColorArgs()[0];
         Color interiorColor = polygon.getImageCommand().getColorArgs()[1];
         ImageCommand imageCommand = polygon.getImageCommand();
-        int xPrev = imageCommand.getNumaricArgs()[1];
-        int yPrev = imageCommand.getNumaricArgs()[2];
-        for (int i = 3; i < imageCommand.getNumaricArgs()[0] * 2 - 2; i += 2) {
-            int xCur = imageCommand.getNumaricArgs()[i];
-            int yCur = imageCommand.getNumaricArgs()[i + 1];
+
+        // drawing the lines
+        int xPrev = imageCommand.getNumericArgs()[1];
+        int yPrev = imageCommand.getNumericArgs()[2];
+        for (int i = 3; i < imageCommand.getNumericArgs()[0] * 2; i += 2) {
+            int xCur = imageCommand.getNumericArgs()[i];
+            int yCur = imageCommand.getNumericArgs()[i + 1];
             Line line = new Line(getLineCommand(
                     xPrev,
                     yPrev,
@@ -182,12 +263,16 @@ public final class DrawVisitor implements Visitor {
                     yCur,
                     contourColor));
             line.accept(this);
+
+            System.out.println(
+                    "Line (" + xPrev + "," + yPrev
+                            + ")-->(" + xCur + "," + xPrev + ")");
             xPrev = xCur;
             yPrev = yCur;
         }
         //last line
-        int xCur = imageCommand.getNumaricArgs()[1];
-        int yCur = imageCommand.getNumaricArgs()[2];
+        int xCur = imageCommand.getNumericArgs()[1];
+        int yCur = imageCommand.getNumericArgs()[2];
 
         Line line = new Line(getLineCommand(
                 xPrev,
@@ -197,14 +282,36 @@ public final class DrawVisitor implements Visitor {
                 contourColor));
         line.accept(this);
 
-        System.out.println(Arrays.toString(polygon.getCenterOfGravity()));
+        System.out.println(
+                "Line (" + xPrev + "," + yPrev
+                        + ")-->(" + xCur + "," + yCur + ")");
 
-        System.out.println("Done.");
+        //fill the shape
+        Canvas image = Canvas.getInstance();
+        int[]center = polygon.getCenterOfGravity();
+        System.out.println(Arrays.toString(center));
+        fill(image,
+                contourColor.getRGB(),
+                interiorColor.getRGB(),
+                center[0],
+                center[1]);
     }
 
     @Override
     public void visit(final Triangle triangle) {
-
+        //constructing imageCommand for polygon from triangle
+        final int nrPointTriangle = 3;
+        ImageCommand imageCommand = new ImageCommand();
+        imageCommand.addNumericArgs(nrPointTriangle);
+        for (int i = 0; i < nrPointTriangle * 2; i++) {
+            imageCommand.addNumericArgs(triangle.getImageCommand().getNumericArgs()[i]);
+        }
+        imageCommand.addColor(triangle.getImageCommand().getColorArgs()[0]);
+        imageCommand.addColor(triangle.getImageCommand().getColorArgs()[1]);
+        //calling polygon command
+        System.out.println(imageCommand);
+        Polygon polygon = new Polygon(imageCommand);
+        polygon.accept(this);
     }
 
     public static void drawContour(final Canvas image,
@@ -267,11 +374,11 @@ public final class DrawVisitor implements Visitor {
         }
         return true;
     }
-    public static void apply(final Canvas image,
-                             final int contourColor,
-                             final int colorToPaint,
-                             final int x,
-                             final int y) {
+    public static void fill(final Canvas image,
+                            final int contourColor,
+                            final int colorToPaint,
+                            final int x,
+                            final int y) {
         final class Coords {
             private int x, y;
             private Coords(final int x, final int y) {
