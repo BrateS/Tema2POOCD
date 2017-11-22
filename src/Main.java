@@ -7,7 +7,6 @@ import interfaces.Shape;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public final class Main {
 
@@ -17,10 +16,11 @@ public final class Main {
 
         Reader reader = new Reader(args[0]);
         ImageCommand[]imageCommands = reader.getImageCommands();
-        System.out.println(Arrays.toString(imageCommands));
 
+        //Creates visitor and Canvas
         DrawVisitor visitor = new DrawVisitor(imageCommands[0]);
 
+        // index from 1 to avoid first ( "CANVAS" ) command
         int indexCommand = 1;
         while (imageCommands.length > indexCommand) {
             ImageCommand imageCommand = imageCommands[indexCommand];

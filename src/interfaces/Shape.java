@@ -10,11 +10,7 @@ public abstract class Shape implements Visitable {
         this.imageCommand = imageCommand;
     }
 
-    /**
-     *
-     * @return imageCommand
-     */
-    public ImageCommand getImageCommand() {
+    public final ImageCommand getImageCommand() {
         return imageCommand;
     }
 }

@@ -12,10 +12,6 @@ public final class Line extends Shape implements Visitable {
         super(imageCommand);
     }
 
-    public void draw(final Canvas image, final ImageCommand imageCommand) {
-
-    }
-
     @Override
     public void accept(final Visitor visitor) {
         visitor.visit(this);

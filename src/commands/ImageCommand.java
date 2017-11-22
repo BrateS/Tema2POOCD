@@ -5,27 +5,36 @@ import java.util.Arrays;
 
 public final class ImageCommand {
     private String command;
-    private int[]numaricArgs;
+    private int[] numericArgs;
     private Color[]colorArgs;
 
-    public static ImageCommand getLineCommand(
+    /**
+     * Creates an imageCommand formatted for a line drawing
+     * @param x1 xStart
+     * @param y1 yStart
+     * @param x2 xFinal
+     * @param y2 yFinal
+     * @param color colorToPaint
+     * @return formatted imageCommand
+     */
+    static ImageCommand getLineCommand(
             final int x1,
             final int y1,
             final int x2,
             final int y2,
             final Color color) {
         ImageCommand imageCommand = new ImageCommand();
-        imageCommand.numaricArgs = new int[4];
+        imageCommand.numericArgs = new int[4];
         imageCommand.colorArgs = new Color[1];
-        imageCommand.numaricArgs[0] = x1;
-        imageCommand.numaricArgs[1] = y1;
-        imageCommand.numaricArgs[2] = x2;
-        imageCommand.numaricArgs[3] = y2;
+        imageCommand.numericArgs[0] = x1;
+        imageCommand.numericArgs[1] = y1;
+        imageCommand.numericArgs[2] = x2;
+        imageCommand.numericArgs[3] = y2;
         imageCommand.colorArgs[0] = color;
         return imageCommand;
     }
 
-    public String getCommand() {
+    String getCommand() {
         return command;
     }
 
@@ -34,9 +43,9 @@ public final class ImageCommand {
     }
 
     public int[] getNumericArgs() {
-        return numaricArgs;
+        return numericArgs;
     }
-    public Color[] getColorArgs() {
+    Color[] getColorArgs() {
         return colorArgs;
     }
 
@@ -53,24 +62,16 @@ public final class ImageCommand {
         }
     }
 
-    @Override
-    public String toString() {
-        return "ImageCommand{" + "command='" + command + '\''
-                + ", numaricArgs=" + Arrays.toString(numaricArgs)
-                + ", colorArgs=" + Arrays.toString(colorArgs)
-                + '}' + "\n";
-    }
-
     public void addNumericArgs(final int newNumericArg) {
-        if (numaricArgs == null) {
-            numaricArgs = new int[1];
-            numaricArgs[0] = newNumericArg;
+        if (numericArgs == null) {
+            numericArgs = new int[1];
+            numericArgs[0] = newNumericArg;
         } else {
-            int[]aux = new int[numaricArgs.length];
-            System.arraycopy(numaricArgs, 0, aux, 0, numaricArgs.length);
-            numaricArgs = new int[numaricArgs.length + 1];
-            System.arraycopy(aux, 0, numaricArgs, 0, numaricArgs.length - 1);
-            numaricArgs[numaricArgs.length - 1] = newNumericArg;
+            int[]aux = new int[numericArgs.length];
+            System.arraycopy(numericArgs, 0, aux, 0, numericArgs.length);
+            numericArgs = new int[numericArgs.length + 1];
+            System.arraycopy(aux, 0, numericArgs, 0, numericArgs.length - 1);
+            numericArgs[numericArgs.length - 1] = newNumericArg;
         }
     }
 }

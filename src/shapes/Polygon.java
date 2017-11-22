@@ -19,43 +19,26 @@ public final class Polygon extends Shape implements Visitable {
     final class Point {
         private float x, y;
 
-        public float getX() {
+        float getX() {
             return x;
         }
 
-        public void setX(final float x) {
-            this.x = x;
-        }
-
-        public float getY() {
+        float getY() {
             return y;
         }
-
-        public void setY(final float y) {
-            this.y = y;
-        }
-
         Point(final float x, final float y) {
             this.x = x;
             this.y = y;
         }
-
-        @Override
-        public String toString() {
-            return "Point{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    '}';
-        }
     }
 
-    public  ArrayList<Point> getPoints() {
+    private ArrayList<Point> getPoints() {
         ImageCommand imageCommand = this.getImageCommand();
         ArrayList<Point> list = new ArrayList<>();
+        // goes through the (x,y) pairs and puts them in the array
         for (int i = 1; i < (imageCommand.getNumericArgs()[0]) * 2; i += 2) {
             int xCur = imageCommand.getNumericArgs()[i];
             int yCur = imageCommand.getNumericArgs()[i + 1];
-            Point point = new Point(xCur, yCur);
             list.add(new Point(xCur, yCur));
         }
         return list;
@@ -68,7 +51,6 @@ public final class Polygon extends Shape implements Visitable {
         for (int i = 0; i < points.size(); i++) {
             Point point = points.get(i);
             Point nextPoint = points.get((i + 1) % points.size());
-
             float auxSum = point.getX() * nextPoint.getY()
                     - nextPoint.getX() * point.getY();
             area += auxSum;
